@@ -178,10 +178,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private final int mScrollTouchSlop;
 
+    //触摸事件down时，会记录point的x、y值
     private float mInitialMotionX;
     private float mInitialMotionY;
+    
+    /**
+     * 锚点 有效值范围[0,1]
+     */
     private float mAnchorPoint = 0.f;
 
+    /**
+     * Panel滑动动作监听
+     */
     private PanelSlideListener mPanelSlideListener;
 
     /**
@@ -200,35 +208,38 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private final Rect mTmpRect = new Rect();
 
     /**
-     * Listener for monitoring events about sliding panes.
+     * Panel滑动动作监听
      */
     public interface PanelSlideListener {
-        /**
-         * Called when a sliding pane's position changes.
-         * @param panel The child view that was moved
-         * @param slideOffset The new offset of this sliding pane within its range, from 0-1
-         */
+        
+    	/**
+    	 * 正在drag时，若有有效的滑动距离，会回调此函数
+    	 * @param panel
+    	 * @param slideOffset
+    	 */
         public void onPanelSlide(View panel, float slideOffset);
+        
         /**
-         * Called when a sliding pane becomes slid completely collapsed. The pane may or may not
-         * be interactive at this point depending on if it's shown or hidden
-         * @param panel The child view that was slid to an collapsed position, revealing other panes
+         * Panel收起时回调
+         * @param panel
          */
         public void onPanelCollapsed(View panel);
 
         /**
-         * Called when a sliding pane becomes slid completely expanded. The pane is now guaranteed
-         * to be interactive. It may now obscure other views in the layout.
-         * @param panel The child view that was slid to a expanded position
+         * Panel展开时回调
+         * @param panel
          */
         public void onPanelExpanded(View panel);
 
+        /**
+         * Panel滑到锚点时，会回调
+         * @param panel
+         */
         public void onPanelAnchored(View panel);
     }
 
     /**
-     * No-op stubs for {@link PanelSlideListener}. If you only want to implement a subset
-     * of the listener methods you can extend this instead of implement the full interface.
+     * 如果你不想实现PanelSlideListener的全部函数，可使用此
      */
     public static class SimplePanelSlideListener implements PanelSlideListener {
         @Override
@@ -245,14 +256,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
 
+    //构造函数
     public SlidingUpPanelLayout(Context context) {
         this(context, null);
     }
 
+    //构造函数
     public SlidingUpPanelLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
+    //构造函数
     public SlidingUpPanelLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         
@@ -264,6 +278,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return;
         }
         
+        //解析系统属性
         if (attrs != null) {
             TypedArray defAttrs = context.obtainStyledAttributes(attrs, DEFAULT_ATTRS);
 
@@ -279,6 +294,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SlidingUpPanelLayout);
 
+            //解析自定义的属性
             if (ta != null) {
                 mPanelHeight = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_panelHeight, -1);
                 mShadowHeight = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_shadowHeight, -1);
@@ -295,6 +311,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             ta.recycle();
         }
 
+        //若在xml为定义某些属性，会在此初始化值
         final float density = context.getResources().getDisplayMetrics().density;
         if (mPanelHeight == -1) {
             mPanelHeight = (int) (DEFAULT_PANEL_HEIGHT * density + 0.5f);
@@ -319,7 +336,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         setWillNotDraw(false);
 
-        //用来处理滑动的核心工具类
+        //用来处理滑动的工具类
         mDragHelper = ViewDragHelper.create(this, 0.5f, new DragHelperCallback());
         mDragHelper.setMinVelocity(mMinFlingVelocity * density);
 
@@ -416,7 +433,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     /**
-     * Sets whether or not the panel overlays the content
+     * 若为false 表示会在mMainview上加上一层蒙层
      * @param overlayed
      */
     public void setOverlayed(boolean overlayed) {
@@ -431,13 +448,20 @@ public class SlidingUpPanelLayout extends ViewGroup {
         return mOverlayContent;
     }
 
-    //Panel有滑动时，分发回调函数
+    /**
+     * Panel有滑动时，用于做分发
+     * @param panel
+     */
     void dispatchOnPanelSlide(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelSlide(panel, mSlideOffset);
         }
     }
-
+    
+    /**
+     * Panel展开时，用于做分发
+     * @param panel
+     */
     void dispatchOnPanelExpanded(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelExpanded(panel);
@@ -445,6 +469,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
     }
 
+    /**
+     * Panel收起时，用于做分发
+     * @param panel
+     */
     void dispatchOnPanelCollapsed(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelCollapsed(panel);
@@ -452,6 +480,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
     }
 
+    /**
+     * Panel滑到锚点时，用于做分发
+     * @param panel
+     */
     void dispatchOnPanelAnchored(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelAnchored(panel);
@@ -488,6 +520,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final int clampedChildRight = Math.min(rightBound, child.getRight());
         final int clampedChildBottom = Math.min(bottomBound, child.getBottom());
         final int vis;
+        //计算若mMainView完全被覆盖时，就隐藏
         if (clampedChildLeft >= left && clampedChildTop >= top &&
                 clampedChildRight <= right && clampedChildBottom <= bottom) {
             vis = INVISIBLE;

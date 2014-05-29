@@ -39,6 +39,7 @@ public class DemoActivity extends Activity {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
 //                Log.i(TAG, "onPanelSlide, offset " + slideOffset);
+            	//ActionBar联动
                 setActionBarTranslation(mLayout.getCurrentParalaxOffset());
             }
 
