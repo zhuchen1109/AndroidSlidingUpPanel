@@ -139,4 +139,13 @@ public class DemoActivity extends Activity {
             }
         }
     }
+    
+    @Override
+    public void onBackPressed() {
+    	if(mLayout != null && mLayout.isExpanded()) {
+    		mLayout.collapsePane();
+    	} else {
+    		super.onBackPressed();
+    	}
+    }
 }
