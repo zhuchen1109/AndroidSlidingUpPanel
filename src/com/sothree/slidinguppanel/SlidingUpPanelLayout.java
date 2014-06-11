@@ -1157,7 +1157,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     @Override
-    protected Parcelable onSaveInstanceState() {
+    public Parcelable onSaveInstanceState() {
     	//保存值
         Parcelable superState = super.onSaveInstanceState();
 
@@ -1168,7 +1168,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     @Override
-    protected void onRestoreInstanceState(Parcelable state) {
+    public void onRestoreInstanceState(Parcelable state) {
     	//恢复值
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
