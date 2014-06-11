@@ -913,6 +913,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * @return
      */
     public boolean expandPane(float mSlideOffset) {
+    	if (mSlideState == SlideState.EXPANDED) return false;
+    	mSlideableView.setVisibility(View.VISIBLE);
         if (!isPaneVisible()) {
             showPane();
         }
@@ -1031,7 +1033,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         canvas.restoreToCount(save);
 
         //非完全收起情况下，需要画一个半透明的蒙层
-        if (drawScrim) {
+        if (drawScrim && mCoveredFadeColor != 0) {
             final int baseAlpha = (mCoveredFadeColor & 0xff000000) >>> 24;//取alpha值
             final int imag = (int) (baseAlpha * (1 - mSlideOffset));//根据滑动的距离越大，蒙层透明度越低
             final int color = imag << 24 | (mCoveredFadeColor & 0xffffff);
