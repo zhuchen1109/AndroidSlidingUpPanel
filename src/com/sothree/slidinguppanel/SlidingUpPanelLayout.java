@@ -1198,18 +1198,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 if (mSlideOffset == 0) {
                     if (mSlideState != SlideState.EXPANDED) {
                         updateObscuredViewVisibility();
-                        dispatchOnPanelExpanded(mSlideableView);
                         mSlideState = SlideState.EXPANDED;
+                        dispatchOnPanelExpanded(mSlideableView);
                     }
                 } else if (mSlideOffset == (float)anchoredTop/(float)mSlideRange) {
                     if (mSlideState != SlideState.ANCHORED) {
                         updateObscuredViewVisibility();
-                        dispatchOnPanelAnchored(mSlideableView);
                         mSlideState = SlideState.ANCHORED;
+                        dispatchOnPanelAnchored(mSlideableView);
                     }
                 } else if (mSlideState != SlideState.COLLAPSED) {
+                	mSlideState = SlideState.COLLAPSED;
                     dispatchOnPanelCollapsed(mSlideableView);
-                    mSlideState = SlideState.COLLAPSED;
                 }
             }
         }
